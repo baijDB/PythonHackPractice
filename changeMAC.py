@@ -1,5 +1,4 @@
-import optparse
-import subprocess
+
 """
 Command line script
 Input:
@@ -10,6 +9,10 @@ Output:
 Function:
 	Change the MAC address of the computer which runs this script
 """
+import optparse
+import subprocess
+import re
+
 def getOptions():
 	parser = optparse.OptionParser()
 	parser.add_option("-i","--interface",dest="interface",help="Interface to change its MAC address")
@@ -31,3 +34,10 @@ if __name__ == "__main__":
 	interface = options.interface
 	mac_addr = options.new_mac
 	changeMAC(interface,mac_addr)
+	ifconfigResult = subprocess.check_output(["ifconfig",interface]).decode('utf-8')
+	pattern = re.compile(r'\w\w:\w\w:\w\w:\w\w:\w\w:\w\w')
+	result = re.search(pattern ,ifconfigResult)
+	if mac_addr == result.group(0):
+		print("The mac address has successfully been changed to {:}".format(mac_addr))
+	else:
+		print("MAC address changing failed")
