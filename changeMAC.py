@@ -29,14 +29,21 @@ def changeMAC(interface,mad_addr):
 	subprocess.call("ifconfig {:} hw ether {:}".format(interface,mac_addr),shell=True)
 	subprocess.call("ifconfig {:} up".format(interface,mac_addr),shell=True)
 
+def returnMACAddr():
+	ifconfigResult = subprocess.check_output(["ifconfig",interface]).decode('utf-8')
+	pattern = re.compile(r'\w\w:\w\w:\w\w:\w\w:\w\w:\w\w')
+	result = re.search(pattern ,ifconfigResult)
+	return result
+
 if __name__ == "__main__":
 	options = getOptions()
 	interface = options.interface
 	mac_addr = options.new_mac
+
 	changeMAC(interface,mac_addr)
-	ifconfigResult = subprocess.check_output(["ifconfig",interface]).decode('utf-8')
-	pattern = re.compile(r'\w\w:\w\w:\w\w:\w\w:\w\w:\w\w')
-	result = re.search(pattern ,ifconfigResult)
+
+	result = returnMACAddr()
+
 	if mac_addr == result.group(0):
 		print("The mac address has successfully been changed to {:}".format(mac_addr))
 	else:
